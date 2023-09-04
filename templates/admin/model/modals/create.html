@@ -1,0 +1,128 @@
+{% import 'admin/static.html' as admin_static with context %} 
+{% import'admin/adminlte/forms.html' as forms with context %} 
+{# store the jinja2 context for form_rules rendering logic #} 
+{% set render_ctx = h.resolve_ctx() %} {%
+block body %} {% if 'livestream' in request.url %}
+
+<div class="row" id="livestream">
+  <div class="col-md-7">
+    {% endif %} {% block create_form %} 
+    {% set modal_name = 'Create' %}
+    {{forms.form(modal_name, None, form, form_opts, return_url,
+    action=url_for('.create_view', url=return_url), has_more=False,
+    is_modal=True) }} 
+    {% endblock %} {% if 'livestream' in request.url %}
+  </div>
+  {% endif %} {% if 'livestream' in request.url %}
+  <div class="col-md-5">
+    <div class="row" id="firstImg" style="margin-bottom: 175px;">
+      <textarea style="margin-top: 70px;width: 100%;font-size: 20px;" placeholder="Enter URL Youtube's Livestream to fast input" id="YouTube_url"></textarea>
+      <h2>Youtube's Thumbnail:</h2>
+      <img
+      id="thumbnail"
+      src=""
+      alt="Thumbnail"
+      style="width: 100%; height: auto"
+      />
+    </div>
+
+    <div class="row">
+      <h2>Your Thumbnail:</h2>
+      <img
+      id="thumbnailFile"
+      src=""
+      alt="Thumbnail"
+      style="width: 100%; height: auto"
+      />
+    </div>
+  </div>
+</div>
+{% endif %} {% endblock %} {% block tail %}
+<script src="{{ admin_static.url(filename='admin/js/bs3_modal.js', v='1.0.0') }}"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+  $(function () {
+    // Apply flask-admin form styles after the modal is loaded
+    window.faForm.applyGlobalStyles(document);
+  });
+  // -----------------------------------------------------------------
+  var youtubeUrl = document.querySelector("textarea#YouTube_url");
+  youtubeUrl.addEventListener("change", fetchVideoInfo);
+  document.querySelector("input#created").setAttribute("readonly", "true");
+
+
+  async function fetchVideoInfo() {
+    var videoId = getYoutubeVideoId(youtubeUrl.value);
+    var apiKey = "AIzaSyBH4G7PUae9gYyuvFh42pXEAlXzlp16D4o"; // Thay YOUR_API_KEY bằng API key của bạn
+    var apiUrl = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${apiKey}&part=snippet`;
+    const data = {
+                url: youtubeUrl.value
+            };
+
+    const response = await fetch('/get_video_info', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+        const ytData = await response.json();
+        console.log(ytData);
+
+        document.querySelector("input#title").value = ytData.title;
+        const firstImg=  document.querySelector('#firstImg')
+        firstImg.style.cssText = ''
+        firstImg.style.cssText='margin-bottom:16px;'
+
+        document.querySelector("textarea#desc").textContent =ytData.description;
+        const textareaRoomID = document.querySelector("textarea#id");
+
+        textareaRoomID.textContent = videoId;
+        textareaRoomID.value = videoId;
+        textareaRoomID.setAttribute("readonly", "true");
+          
+        document.querySelector("textarea#host").textContent =ytData.author;
+        document.querySelector("input#view").value =ytData.views;
+        
+
+        document.querySelector("#thumbnail").src =ytData.thumbnail
+  }
+
+  function getYoutubeVideoId(url) {
+    var videoId = url.split("v=")[1];
+    var ampersandPosition = videoId.indexOf("&");
+    if (ampersandPosition !== -1) {
+      videoId = videoId.substring(0, ampersandPosition);
+    }
+    return videoId;
+  }
+
+//  ------------------------------------------------------------------
+function convertImageToBase64() {
+  var input = document.querySelector('input#image');
+  var file = input.files[0];
+  if (file) {
+    var reader = new FileReader();
+    
+    reader.onload = function(e) {
+      var img = document.getElementById('thumbnailFile');
+      img.src = e.target.result;
+    }
+    
+    reader.readAsDataURL(file);
+  }
+}
+
+var inputImg = document.querySelector('input#image');
+// inputImg.removeAttribute('name')
+inputImg.addEventListener('change', convertImageToBase64); 
+
+var imageLabel = document.querySelector('label[for="image"]');
+var strongElement = document.createElement("strong");
+strongElement.style.color = "red";
+strongElement.innerHTML = "*";
+imageLabel.appendChild(strongElement);
+
+
+</script>
+{% endblock %}

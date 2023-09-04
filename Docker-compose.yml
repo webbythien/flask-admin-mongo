@@ -1,0 +1,12 @@
+version: '3.1'
+services:
+  admin-app:
+    image: adminesollab/dev-repository:admin-panel-dev-latest
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5009:5009"
