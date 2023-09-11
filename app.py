@@ -9,7 +9,11 @@ from views.livestream import LivestreamView
 from views.myview import MyView
 from models.livestream import Livestream
 from models.video import Video
+from models.bannedWord import BannedWord
+from models.bannedMessage import BannedMessages
 from views.video import VideoView
+from views.bannedWord import BannedWordView
+from views.bannedMessage import BannedMessageView
 from flask import Flask, url_for, redirect, request
 from flask_migrate import Migrate
 from flask_security import Security, login_required, current_user
@@ -18,7 +22,8 @@ from flask_admin import helpers as admin_helpers
 from adminlte.admin import AdminLte, admin_db_store
 from models import dbMongo
 import pytube
-
+from views.advertisement import AdvertisementView
+from models.advertisement import Advertisement
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 
@@ -41,6 +46,12 @@ admin.set_category_icon(name = 'Livestream', icon_value ='fa-video-camera')
 admin.add_view(LivestreamView(Livestream, name = "Streaming", category="Livestream", menu_icon_value = 'fa-eye'))
 admin.add_view(VideoView(Video, name = "Video", category="Livestream", menu_icon_value = 'fa-youtube-play'))
 
+
+admin.set_category_icon(name = 'Banned', icon_value ='fa-comments-o')
+admin.add_view(BannedWordView(BannedWord, name = "Banned Words", category="Banned", menu_icon_value = 'fa-hand-lizard-o'))
+admin.add_view(BannedMessageView(BannedMessages, name = "Banned Messages", category="Banned", menu_icon_value = 'fa-thumbs-down'))
+
+admin.add_view(AdvertisementView(Advertisement, name = "Advertisement", category="", menu_icon_value = 'fa-tags'))
 
 
 @security.context_processor

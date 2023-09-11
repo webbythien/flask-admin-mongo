@@ -2,8 +2,8 @@
 {% import'admin/adminlte/forms.html' as forms with context %} 
 {# store the jinja2 context for form_rules rendering logic #} 
 {% set render_ctx = h.resolve_ctx() %} {%
-block body %} {% if 'livestream' in request.url %}
-
+block body %} 
+{% if 'livestream' in request.url or 'advertisement' in request.url  %}
 <div class="row" id="livestream">
   <div class="col-md-7">
     {% endif %} {% block create_form %} 
@@ -11,10 +11,11 @@ block body %} {% if 'livestream' in request.url %}
     {{forms.form(modal_name, None, form, form_opts, return_url,
     action=url_for('.create_view', url=return_url), has_more=False,
     is_modal=True) }} 
-    {% endblock %} {% if 'livestream' in request.url %}
+    {% endblock %} {% if 'livestream' in request.url or  'advertisement' in request.url  %}
   </div>
-  {% endif %} {% if 'livestream' in request.url %}
+  {% endif %} {% if 'livestream' in request.url or  'advertisement' in request.url  %}
   <div class="col-md-5">
+    {% if 'livestream' in request.url%}
     <div class="row" id="firstImg" style="margin-bottom: 175px;">
       <textarea style="margin-top: 70px;width: 100%;font-size: 20px;" placeholder="Enter URL Youtube's Livestream to fast input" id="YouTube_url"></textarea>
       <h2>Youtube's Thumbnail:</h2>
@@ -25,8 +26,7 @@ block body %} {% if 'livestream' in request.url %}
       style="width: 100%; height: auto"
       />
     </div>
-
-    <div class="row">
+    <div class="row" id="secondImg" style="margin-bottom: 150px;">
       <h2>Your Thumbnail:</h2>
       <img
       id="thumbnailFile"
@@ -35,6 +35,31 @@ block body %} {% if 'livestream' in request.url %}
       style="width: 100%; height: auto"
       />
     </div>
+
+    <div class="row">
+      <h2>Your Galxe's Image:</h2>
+      <img
+      id="thumbnailFileGalxe"
+      src=""
+      alt="Thumbnail"
+      style="width: 100%; height: auto"
+      />
+    </div>
+    {% endif %}
+
+    {% if 'advertisement' in request.url%}
+    <div class="row">
+      <h2>Your Image:</h2>
+      <img
+      id="thumbnailFile"
+      src=""
+      alt="Thumbnail"
+      style="width: 100%; height: auto"
+      />
+    </div>
+
+    {% endif %}
+
   </div>
 </div>
 {% endif %} {% endblock %} {% block tail %}
@@ -45,6 +70,54 @@ block body %} {% if 'livestream' in request.url %}
     // Apply flask-admin form styles after the modal is loaded
     window.faForm.applyGlobalStyles(document);
   });
+
+  //  ------------------------------------------------------------------
+function convertImageToBase64Galxe() {
+  var input = document.querySelector('input#image_galxe');
+  var file = input.files[0];
+  if (file) {
+    var reader = new FileReader();
+    
+    reader.onload = function(e) {
+      var img = document.getElementById('thumbnailFileGalxe');
+      img.src = e.target.result;
+    }
+    
+    reader.readAsDataURL(file);
+  }
+}
+
+function convertImageToBase64() {
+  var input = document.querySelector('input#image');
+  var file = input.files[0];
+  if (file) {
+    var reader = new FileReader();
+    
+    reader.onload = function(e) {
+      var img = document.getElementById('thumbnailFile');
+      img.src = e.target.result;
+    }
+    
+    reader.readAsDataURL(file);
+    const secondImg=  document.querySelector('#secondImg')
+        secondImg.style.cssText = ''
+        secondImg.style.cssText='margin-bottom:16px;'
+
+  }
+}
+//----------------------------------------------------------------
+var imageLabel = document.querySelector('label[for="image"]');
+var strongElement = document.createElement("strong");
+strongElement.style.color = "red";
+strongElement.innerHTML = "*";
+imageLabel.appendChild(strongElement);
+
+var inputImg = document.querySelector('input#image');
+var inputImgGalxe = document.querySelector('input#image_galxe');
+// inputImg.removeAttribute('name')
+inputImg.addEventListener('change', convertImageToBase64); 
+inputImgGalxe.addEventListener('change', convertImageToBase64Galxe); 
+
   // -----------------------------------------------------------------
   var youtubeUrl = document.querySelector("textarea#YouTube_url");
   youtubeUrl.addEventListener("change", fetchVideoInfo);
@@ -73,6 +146,7 @@ block body %} {% if 'livestream' in request.url %}
         const firstImg=  document.querySelector('#firstImg')
         firstImg.style.cssText = ''
         firstImg.style.cssText='margin-bottom:16px;'
+        
 
         document.querySelector("textarea#desc").textContent =ytData.description;
         const textareaRoomID = document.querySelector("textarea#id");
@@ -97,31 +171,7 @@ block body %} {% if 'livestream' in request.url %}
     return videoId;
   }
 
-//  ------------------------------------------------------------------
-function convertImageToBase64() {
-  var input = document.querySelector('input#image');
-  var file = input.files[0];
-  if (file) {
-    var reader = new FileReader();
-    
-    reader.onload = function(e) {
-      var img = document.getElementById('thumbnailFile');
-      img.src = e.target.result;
-    }
-    
-    reader.readAsDataURL(file);
-  }
-}
 
-var inputImg = document.querySelector('input#image');
-// inputImg.removeAttribute('name')
-inputImg.addEventListener('change', convertImageToBase64); 
-
-var imageLabel = document.querySelector('label[for="image"]');
-var strongElement = document.createElement("strong");
-strongElement.style.color = "red";
-strongElement.innerHTML = "*";
-imageLabel.appendChild(strongElement);
 
 
 </script>

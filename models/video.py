@@ -14,6 +14,9 @@ class Video(dbMongo.Document):
     host = dbMongo.StringField(required=True,default='Lido')
     created= dbMongo.IntField(required=True,default=int(datetime.datetime.now().timestamp()))
     _id = dbMongo.ObjectIdField(primary_key=True,default=ObjectId)  # Trường _id
+    name_galxe = dbMongo.StringField(required=True)
+    link_galxe = dbMongo.StringField(required=True)
+    image_galxe_url = dbMongo.StringField()
     meta = {
         "collection": "videos",# Replace with your desired collection name
          "id_field": "_id" 

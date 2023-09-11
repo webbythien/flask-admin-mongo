@@ -15,6 +15,15 @@ class VideoView(BaseAdminViewMongo):
     edit_modal = False
     create_modal = False
     details_modal = False
+    column_labels = {
+        'title': 'Title',
+        'desc': 'Description',
+        'view': 'View',  # Rename the 'view' column to 'View'
+        'status': 'Status',
+        'name_galxe': 'Name Galxe',
+        'link_galxe': 'Link Galxe',
+        'image_galxe_url':'Image Galxe'
+    }
     def get_query(self):
         # Customize the query to filter rows where status is True
-        return super(VideoView, self).get_query().filter(status='off')
+        return super(VideoView, self).get_query().filter(status='off').order_by('-created')
